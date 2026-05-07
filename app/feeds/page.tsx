@@ -9,20 +9,16 @@ import { Events, Explore, Suggest } from "@/components/left-sidebar"
 import { Post } from "@/components/post"
 import { Friends, Suggestion } from "@/components/right-sidebar"
 import { StoryFeedDesktop, StoryFeedMobile } from "@/components/story-feed"
-import { isAuthenticated } from "@/lib/auth/session"
-import { getAuthenticatedUser } from "@/lib/auth/user"
-import { redirect } from "next/navigation"
+import { getFeedFromApi } from "@/lib/feed/api"
+import { requireAuthSession } from "@/lib/auth/user"
+import type { FeedPost } from "@/types/feed"
 
 export default async function FeedsPage() {
-  if (!(await isAuthenticated())) {
-    redirect("/login")
-  }
+  const { user } = await requireAuthSession()
 
-  const user = await getAuthenticatedUser()
+  let posts: FeedPost[] = []
 
-  if (!user) {
-    redirect("/login")
-  }
+  posts = await getFeedFromApi()
 
   const userName = `${user.first_name} ${user.last_name}`.trim()
 
@@ -49,11 +45,15 @@ export default async function FeedsPage() {
                       <StoryFeedDesktop />
                       <StoryFeedMobile />
                     <CreatePost />
-                    <Post />
-                    <Post />
-                    <Post />
-                    <Post />
-                    <Post />
+                    {posts.length ? posts.map((post) => (
+                      <Post key={post.id} post={post} />
+                    )) : (
+                      <div className="_feed_inner_timeline_post_area _b_radious6 _padd_b24 _padd_t24 _mar_b16">
+                        <div className="_feed_inner_timeline_content _padd_r24 _padd_l24">
+                          <h4 className="_feed_inner_timeline_post_title">No posts available yet.</h4>
+                        </div>
+                      </div>
+                    )}
                     </div>
                   </div>
                 </div>

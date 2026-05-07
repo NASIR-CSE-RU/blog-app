@@ -1,8 +1,9 @@
 import "server-only";
 
 import { clearAuthSession, getAuthToken, getAuthUser } from "@/lib/auth/session";
+import { redirect } from "next/navigation";
 
-export async function getAuthenticatedUser() {
+export async function requireAuthSession() {
   const token = await getAuthToken();
   const user = await getAuthUser();
 
@@ -11,8 +12,13 @@ export async function getAuthenticatedUser() {
       await clearAuthSession();
     }
 
-    return null;
+    redirect("/login");
   }
 
-  return user;
+  return { token, user };
+}
+
+export async function getAuthenticatedUser() {
+  const session = await requireAuthSession();
+  return session.user;
 }
