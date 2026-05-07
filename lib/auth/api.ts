@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getApiBaseUrl } from "@/lib/env";
+import { ApiRequestError, getApiErrorMessage } from "@/lib/api/errors";
 import type { ApiResponse, AuthUser, LoginPayload } from "@/types/auth";
 
 type LoginInput = {
@@ -14,32 +15,6 @@ type RegisterInput = {
   email: string;
   password: string;
 };
-
-export class AuthApiError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "AuthApiError";
-  }
-}
-
-function getErrorMessage(payload: {
-  message?: string;
-  errors?: unknown;
-} | null) {
-  if (
-    payload?.errors &&
-    typeof payload.errors === "object" &&
-    !Array.isArray(payload.errors)
-  ) {
-    for (const value of Object.values(payload.errors as Record<string, unknown>)) {
-      if (Array.isArray(value) && typeof value[0] === "string") {
-        return value[0];
-      }
-    }
-  }
-
-  return payload?.message ?? "Unable to complete the request right now.";
-}
 
 export async function loginWithApi({ email, password }: LoginInput) {
   const response = await fetch(`${getApiBaseUrl()}/login`, {
@@ -55,7 +30,7 @@ export async function loginWithApi({ email, password }: LoginInput) {
   const payload = (await response.json().catch(() => null)) as ApiResponse<LoginPayload> | null;
 
   if (!response.ok || !payload?.success || !payload.data?.access_token) {
-    throw new AuthApiError(getErrorMessage(payload));
+    throw new ApiRequestError(getApiErrorMessage(payload));
   }
 
   return payload.data;
@@ -75,7 +50,7 @@ export async function registerWithApi(input: RegisterInput) {
   const payload = (await response.json().catch(() => null)) as ApiResponse<AuthUser> | null;
 
   if (!response.ok || !payload?.success || !payload.data) {
-    throw new AuthApiError(getErrorMessage(payload));
+    throw new ApiRequestError(getApiErrorMessage(payload));
   }
 
   return payload.data;
@@ -93,7 +68,7 @@ export async function getCurrentUserFromApi(token: string) {
   const payload = (await response.json().catch(() => null)) as AuthUser | null;
 
   if (!response.ok || !payload?.id) {
-    throw new AuthApiError("Unable to load the authenticated user.");
+    throw new ApiRequestError("Unable to load the authenticated user.");
   }
 
   return payload;

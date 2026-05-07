@@ -1,29 +1,34 @@
 import "server-only";
 
-import { AuthApiError } from "@/lib/auth/api";
 import { fetchAuthenticatedApi } from "@/lib/api/server";
+import { ApiRequestError, getApiErrorMessage } from "@/lib/api/errors";
 import type { ApiResponse } from "@/types/auth";
 import type { FeedPost } from "@/types/feed";
 
 type CreatePostInput = {
   content: string;
-  image_url?: string | null;
+  image?: File | null;
   visibility: "public" | "private";
 };
 
 export async function createPostFromApi(input: CreatePostInput) {
+  const formData = new FormData();
+  formData.set("content", input.content);
+  formData.set("visibility", input.visibility);
+
+  if (input.image) {
+    formData.set("image", input.image);
+  }
+
   const response = await fetchAuthenticatedApi("/posts", {
     method: "POST",
-    body: JSON.stringify(input),
-    headers: {
-      "Content-Type": "application/json",
-    },
+    body: formData,
   });
 
   const payload = (await response.json().catch(() => null)) as ApiResponse<FeedPost> | null;
 
   if (!response.ok || !payload?.success || !payload.data) {
-    throw new AuthApiError(payload?.message ?? "Unable to create post right now.");
+    throw new ApiRequestError(getApiErrorMessage(payload), payload);
   }
 
   return payload.data;
