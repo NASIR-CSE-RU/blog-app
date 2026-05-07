@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Authentication Setup
+
+Create a local environment file before starting the app:
+
+```bash
+cp .env.example .env.local
+```
+
+`BLOG_API_BASE_URL` should point to the Laravel API base URL. The default example targets a local `blog-api` instance on `http://127.0.0.1:8000/api`.
+
 ## Getting Started
 
 First, run the development server:

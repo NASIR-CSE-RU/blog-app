@@ -27,8 +27,8 @@ export default function Events() {
                         </div>
                         <hr className="_underline" />
                         <div className="_left_inner_event_bottom">
-                            <p className="_left_iner_event_bottom">17 People Going</p> <a href="#0"
-                                className="_left_iner_event_bottom_link">Going</a>
+                            <p className="_left_iner_event_bottom">17 People Going</p>
+                            <button type="button" className="_left_iner_event_bottom_link">Going</button>
                         </div>
                     </div>
                 </a>
@@ -50,8 +50,8 @@ export default function Events() {
                         </div>
                         <hr className="_underline" />
                         <div className="_left_inner_event_bottom">
-                            <p className="_left_iner_event_bottom">17 People Going</p> <a href="#0"
-                                className="_left_iner_event_bottom_link">Going</a>
+                            <p className="_left_iner_event_bottom">17 People Going</p>
+                            <button type="button" className="_left_iner_event_bottom_link">Going</button>
                         </div>
                     </div>
                 </a>

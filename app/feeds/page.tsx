@@ -9,13 +9,28 @@ import { Events, Explore, Suggest } from "@/components/left-sidebar"
 import { Post } from "@/components/post"
 import { Friends, Suggestion } from "@/components/right-sidebar"
 import { StoryFeedDesktop, StoryFeedMobile } from "@/components/story-feed"
+import { isAuthenticated } from "@/lib/auth/session"
+import { getAuthenticatedUser } from "@/lib/auth/user"
+import { redirect } from "next/navigation"
 
-export default function FeedsPage() {
+export default async function FeedsPage() {
+  if (!(await isAuthenticated())) {
+    redirect("/login")
+  }
+
+  const user = await getAuthenticatedUser()
+
+  if (!user) {
+    redirect("/login")
+  }
+
+  const userName = `${user.first_name} ${user.last_name}`.trim()
+
   return (
     <div className="_layout _layout_main_wrapper">
         <LayoutMood/>
         <div className="_main_layout">
-          <DesktopHeader />
+          <DesktopHeader userName={userName} />
         <MobileHeader />
           <MobileNavbar />
           <div className="container _custom_container">
