@@ -1,9 +1,9 @@
 import {
   CommentReactionIcon,
   DropdownDotsIcon,
-  HahaReactionIcon,
   ShareReactionIcon,
 } from "@/components/icons";
+import PostLikeButton from "@/components/post/PostLikeButton";
 import PostCommentsSection from "@/components/post/PostCommentsSection";
 import type { FeedPost } from "@/types/feed";
 
@@ -69,29 +69,13 @@ export default function Post({ post }: PostProps) {
           </div>
         ) : null}
       </div>
-      <div className="_feed_inner_timeline_total_reacts _padd_r24 _padd_l24 _mar_b26">
-        <div className="_feed_inner_timeline_total_reacts_image">
-          <img src="/assets/images/react_img1.png" alt="Image" className="_react_img1" />
-          <img src="/assets/images/react_img2.png" alt="Image" className="_react_img" />
-          <img src="/assets/images/react_img3.png" alt="Image" className="_react_img _rect_img_mbl_none" />
-          <p className="_feed_inner_timeline_total_reacts_para">9+</p>
-        </div>
-        <div className="_feed_inner_timeline_total_reacts_txt">
-          <p className="_feed_inner_timeline_total_reacts_para1">
-            <a href="#0"><span>{post.comments_count}</span> Comment</a>
-          </p>
-          <p className="_feed_inner_timeline_total_reacts_para2"><span>122</span> Share</p>
-        </div>
-      </div>
-      <div className="_feed_inner_timeline_reaction">
-        <button type="button" className="_feed_inner_timeline_reaction_emoji _feed_reaction _feed_reaction_active">
-          <span className="_feed_inner_timeline_reaction_link">
-            <span>
-              <HahaReactionIcon />
-              Haha
-            </span>
-          </span>
-        </button>
+      <PostLikeButton
+        postId={post.id}
+        initialReactionsCount={post.reactions_count}
+        initialViewerHasLiked={post.viewer_has_liked}
+        reactionUsers={post.reaction_users}
+        commentsCount={post.comments_count}
+      >
         <button type="button" className="_feed_inner_timeline_reaction_comment _feed_reaction">
           <span className="_feed_inner_timeline_reaction_link">
             <span>
@@ -108,7 +92,7 @@ export default function Post({ post }: PostProps) {
             </span>
           </span>
         </button>
-      </div>
+      </PostLikeButton>
       <PostCommentsSection postId={post.id} comments={post.comments} commentsCount={post.comments_count} />
     </div>
   );

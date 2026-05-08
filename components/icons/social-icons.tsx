@@ -2,6 +2,10 @@ type IconProps = {
   className?: string;
 };
 
+type LikeReactionIconProps = IconProps & {
+  active?: boolean;
+};
+
 export function DropdownDotsIcon({ className }: IconProps) {
   return (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="4" height="17" fill="none" viewBox="0 0 4 17">
@@ -19,6 +23,24 @@ export function HahaReactionIcon({ className }: IconProps) {
       <path fill="#664500" d="M9.5 11.083c-1.912 0-3.181-.222-4.75-.527-.358-.07-1.056 0-1.056 1.055 0 2.111 2.425 4.75 5.806 4.75 3.38 0 5.805-2.639 5.805-4.75 0-1.055-.697-1.125-1.055-1.055-1.57.305-2.838.527-4.75.527z" />
       <path fill="#fff" d="M4.75 11.611s1.583.528 4.75.528 4.75-.528 4.75-.528-1.056 2.111-4.75 2.111-4.75-2.11-4.75-2.11z" />
       <path fill="#664500" d="M6.333 8.972c.729 0 1.32-.827 1.32-1.847s-.591-1.847-1.32-1.847c-.729 0-1.32.827-1.32 1.847s.591 1.847 1.32 1.847zM12.667 8.972c.729 0 1.32-.827 1.32-1.847s-.591-1.847-1.32-1.847c-.729 0-1.32.827-1.32 1.847s.591 1.847 1.32 1.847z" />
+    </svg>
+  );
+}
+
+export function LikeReactionIcon({ className, active = false }: LikeReactionIconProps) {
+  const fill = active ? "#1877F2" : "none";
+  const stroke = active ? "#1877F2" : "#65676B";
+
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="none" viewBox="0 0 24 24">
+      <path
+        fill={fill}
+        stroke={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+        d="M9.5 10.25V20H5.75A1.75 1.75 0 0 1 4 18.25v-6.5C4 10.78 4.78 10 5.75 10H9.5Zm0 0 3.03-5.8c.34-.66 1.02-1.08 1.76-1.08h.21c.83 0 1.5.67 1.5 1.5v3.13H19a1.75 1.75 0 0 1 1.71 2.12l-1.54 7A1.75 1.75 0 0 1 17.46 18.5H9.5"
+      />
     </svg>
   );
 }

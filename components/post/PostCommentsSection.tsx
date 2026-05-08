@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
+import { LikeReactionIcon } from "@/components/icons";
+import { usePostComments } from "@/components/post/hooks/usePostComments";
+import { useReactionToggle } from "@/components/post/hooks/useReactionToggle";
 import CommentComposer from "@/components/post/CommentComposer";
-import { getPostCommentsFromClientApi } from "@/lib/comment/client";
-import { ApiRequestError } from "@/lib/api/errors";
 import type { CommentItem } from "@/types/comment";
 
 type PostCommentsSectionProps = {
@@ -40,6 +41,42 @@ function CommentList({
   );
 }
 
+function CommentLikeButton({ commentId, initialReactionsCount, initialViewerHasLiked }: {
+  commentId: number;
+  initialReactionsCount: number;
+  initialViewerHasLiked: boolean;
+}) {
+  const { errorMessage, hasLiked, isPending, label, reactionsCount, toggleReaction } = useReactionToggle({
+    reactableType: "comment",
+    reactableId: commentId,
+    initialReactionsCount,
+    initialViewerHasLiked,
+  });
+
+  return (
+    <>
+      <button
+        type="button"
+        className={`_previous_comment_txt p-0${hasLiked ? " text-primary" : ""}`}
+        onClick={toggleReaction}
+        disabled={isPending}
+        aria-pressed={hasLiked}
+      >
+        <span className="d-inline-flex align-items-center gap-1">
+          <LikeReactionIcon active={hasLiked} className="flex-shrink-0" />
+          <span>{label}</span>
+          {reactionsCount > 0 ? <span>({reactionsCount})</span> : null}
+        </span>
+      </button>
+      {errorMessage ? (
+        <p className="text-danger mb-0 mt-2" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
+    </>
+  );
+}
+
 function CommentCard({
   comment,
   onReply,
@@ -72,7 +109,13 @@ function CommentCard({
           <div className="_comment_reply">
             <div className="_comment_reply_num">
               <ul className="_comment_reply_list">
-                <li><span>Like.</span></li>
+                <li>
+                  <CommentLikeButton
+                    commentId={comment.id}
+                    initialReactionsCount={comment.reactions_count}
+                    initialViewerHasLiked={comment.viewer_has_liked}
+                  />
+                </li>
                 <li>
                   <button
                     type="button"
@@ -144,40 +187,10 @@ export default function PostCommentsSection({
   comments,
   commentsCount,
 }: PostCommentsSectionProps) {
-  const [visibleComments, setVisibleComments] = useState(comments);
-  const [hasLoadedAll, setHasLoadedAll] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setVisibleComments(comments);
-    setHasLoadedAll(false);
-    setLoadError(null);
-  }, [comments]);
-
-  async function loadAllComments() {
-    if (hasLoadedAll || isLoadingMore) {
-      return;
-    }
-
-    setIsLoadingMore(true);
-    setLoadError(null);
-
-    try {
-      const nextComments = await getPostCommentsFromClientApi(postId);
-
-      setVisibleComments(nextComments);
-      setHasLoadedAll(true);
-    } catch (error) {
-      if (error instanceof ApiRequestError) {
-        setLoadError(error.message);
-      } else {
-        setLoadError(error instanceof Error ? error.message : "Unable to load comments right now.");
-      }
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }
+  const { hasLoadedAll, isLoadingMore, loadAllComments, loadError, visibleComments } = usePostComments({
+    postId,
+    comments,
+  });
 
   const hasMoreComments = commentsCount > visibleComments.length;
 

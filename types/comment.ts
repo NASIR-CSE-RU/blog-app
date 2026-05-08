@@ -6,6 +6,8 @@ export type CommentItem = {
   parent_id: number | null;
   content: string;
   replies_count: number;
+  reactions_count: number;
+  viewer_has_liked: boolean;
   created_at: string;
   updated_at: string;
   user: AuthUser;
