@@ -3,10 +3,15 @@
 import { revalidatePath } from "next/cache";
 
 import { ApiRequestError, getApiFieldError } from "@/lib/api/errors";
+import { createCommentFromApi } from "@/lib/comment/api";
 import { createPostFromApi } from "@/lib/post/api";
+import type { CreateCommentFormState } from "@/types/comment";
 import type { CreatePostFormState } from "@/types/post";
 
-const EMPTY_CONTENT_MESSAGE = "Write something before posting.";
+const EMPTY_CONTENT_MESSAGE = "Write something before sending.";
+const INVALID_POST_MESSAGE = "Post not found.";
+const INVALID_PARENT_MESSAGE = "Reply target is invalid.";
+const EMPTY_POST_CONTENT_MESSAGE = "Write something before posting.";
 const INVALID_IMAGE_MESSAGE = "Choose a valid image file.";
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGE_SIZE_MESSAGE = "Photo must be 5MB or smaller.";
@@ -25,7 +30,7 @@ export async function createPostAction(
   if (!content) {
     return {
       errors: {
-        content: EMPTY_CONTENT_MESSAGE,
+        content: EMPTY_POST_CONTENT_MESSAGE,
       },
     };
   }
@@ -75,6 +80,70 @@ export async function createPostAction(
     return {
       errors: {
         form: error instanceof Error ? error.message : "Unable to create post right now.",
+      },
+    };
+  }
+
+  revalidatePath("/feeds");
+
+  return {
+    success: true,
+  };
+}
+
+export async function createCommentAction(
+  _prevState: CreateCommentFormState,
+  formData: FormData,
+): Promise<CreateCommentFormState> {
+  const content = String(formData.get("content") ?? "").trim();
+  const postId = Number(formData.get("postId"));
+  const parentIdValue = formData.get("parentId");
+  const parentId = parentIdValue ? Number(parentIdValue) : null;
+
+  if (!content) {
+    return {
+      errors: {
+        content: EMPTY_CONTENT_MESSAGE,
+      },
+    };
+  }
+
+  if (!Number.isInteger(postId) || postId <= 0) {
+    return {
+      errors: {
+        form: INVALID_POST_MESSAGE,
+      },
+    };
+  }
+
+  if (parentIdValue !== null && (!Number.isInteger(parentId) || parentId <= 0)) {
+    return {
+      errors: {
+        parent_id: INVALID_PARENT_MESSAGE,
+      },
+    };
+  }
+
+  try {
+    await createCommentFromApi({
+      postId,
+      content,
+      parentId,
+    });
+  } catch (error) {
+    if (error instanceof ApiRequestError) {
+      return {
+        errors: {
+          content: getApiFieldError(error.payload, "content"),
+          parent_id: getApiFieldError(error.payload, "parent_id"),
+          form: error.message,
+        },
+      };
+    }
+
+    return {
+      errors: {
+        form: error instanceof Error ? error.message : "Unable to send comment right now.",
       },
     };
   }

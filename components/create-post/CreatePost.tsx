@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 
-import { createPostAction } from "@/app/feeds/actions";
+import { createPostAction } from "@/app/posts/actions";
 import type { CreatePostFormState } from "@/types/post";
 import CreatePostImagePicker, {
   type CreatePostImagePickerHandle,
