@@ -10,12 +10,14 @@ const EMPTY_CONTENT_MESSAGE = "Write something before posting.";
 const INVALID_IMAGE_MESSAGE = "Choose a valid image file.";
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGE_SIZE_MESSAGE = "Photo must be 5MB or smaller.";
+const INVALID_VISIBILITY_MESSAGE = "Choose who can see this post.";
 
 export async function createPostAction(
   _prevState: CreatePostFormState,
   formData: FormData,
 ): Promise<CreatePostFormState> {
   const content = String(formData.get("content") ?? "").trim();
+  const visibility = String(formData.get("visibility") ?? "public").trim();
   const imageValue = formData.get("image");
   const image =
     imageValue instanceof File && imageValue.size > 0 ? imageValue : null;
@@ -44,11 +46,19 @@ export async function createPostAction(
     };
   }
 
+  if (visibility !== "public" && visibility !== "private") {
+    return {
+      errors: {
+        visibility: INVALID_VISIBILITY_MESSAGE,
+      },
+    };
+  }
+
   try {
     await createPostFromApi({
       content,
       image,
-      visibility: "public",
+      visibility,
     });
   } catch (error) {
     if (error instanceof ApiRequestError) {
@@ -56,6 +66,7 @@ export async function createPostAction(
         errors: {
           content: getApiFieldError(error.payload, "content"),
           image: getApiFieldError(error.payload, "image"),
+          visibility: getApiFieldError(error.payload, "visibility"),
           form: error.message,
         },
       };
