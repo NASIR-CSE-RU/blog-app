@@ -22,4 +22,22 @@ export type FeedPost = {
   comments: CommentItem[];
 };
 
-export type FeedResponse = ApiResponse<FeedPost[]>;
+export type FeedPagination = {
+  total: number;
+  count: number;
+  per_page: number;
+  current_page: number;
+  total_pages: number;
+  has_more_pages: boolean;
+};
+
+export type FeedResponse = ApiResponse<FeedPost[]> & {
+  meta: ApiResponse<FeedPost[]>["meta"] & {
+    pagination: FeedPagination;
+  };
+};
+
+export type FeedPage = {
+  posts: FeedPost[];
+  pagination: FeedPagination;
+};

@@ -6,19 +6,17 @@ import {
 } from "@/components/common"
 import { CreatePost } from "@/components/create-post"
 import { Events, Explore, Suggest } from "@/components/left-sidebar"
-import { Post } from "@/components/post"
+import { FeedTimeline } from "@/components/post"
 import { Friends, Suggestion } from "@/components/right-sidebar"
 import { StoryFeedDesktop, StoryFeedMobile } from "@/components/story-feed"
 import { getFeedFromApi } from "@/lib/feed/api"
 import { requireAuthSession } from "@/lib/auth/user"
-import type { FeedPost } from "@/types/feed"
+
+const INITIAL_FEED_PAGE_SIZE = 4
 
 export default async function FeedsPage() {
   const { user } = await requireAuthSession()
-
-  let posts: FeedPost[] = []
-
-  posts = await getFeedFromApi()
+  const initialFeedPage = await getFeedFromApi(1, INITIAL_FEED_PAGE_SIZE)
 
   const userName = `${user.first_name} ${user.last_name}`.trim()
 
@@ -45,15 +43,7 @@ export default async function FeedsPage() {
                       <StoryFeedDesktop />
                       <StoryFeedMobile />
                     <CreatePost />
-                    {posts.length ? posts.map((post) => (
-                      <Post key={post.id} post={post} />
-                    )) : (
-                      <div className="_feed_inner_timeline_post_area _b_radious6 _padd_b24 _padd_t24 _mar_b16">
-                        <div className="_feed_inner_timeline_content _padd_r24 _padd_l24">
-                          <h4 className="_feed_inner_timeline_post_title">No posts available yet.</h4>
-                        </div>
-                      </div>
-                    )}
+                    <FeedTimeline initialPage={initialFeedPage} />
                     </div>
                   </div>
                 </div>
