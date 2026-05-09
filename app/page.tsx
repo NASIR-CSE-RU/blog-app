@@ -1,5 +1,11 @@
 import { redirect } from "next/navigation";
 
-export default function Home() {
+import { isAuthenticated } from "@/lib/auth/session";
+
+export default async function Home() {
+  if (await isAuthenticated()) {
+    redirect("/feeds");
+  }
+
   redirect("/login");
 }

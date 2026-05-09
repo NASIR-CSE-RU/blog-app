@@ -6,16 +6,25 @@ import {
 } from "@/components/common"
 import { CreatePost } from "@/components/create-post"
 import { Events, Explore, Suggest } from "@/components/left-sidebar"
-import { Post } from "@/components/post"
+import { FeedTimeline } from "@/components/post"
 import { Friends, Suggestion } from "@/components/right-sidebar"
 import { StoryFeedDesktop, StoryFeedMobile } from "@/components/story-feed"
+import { getFeedFromApi } from "@/lib/feed/api"
+import { requireAuthSession } from "@/lib/auth/user"
 
-export default function FeedsPage() {
+const INITIAL_FEED_PAGE_SIZE = 4
+
+export default async function FeedsPage() {
+  const { user } = await requireAuthSession()
+  const initialFeedPage = await getFeedFromApi(1, INITIAL_FEED_PAGE_SIZE)
+
+  const userName = `${user.first_name} ${user.last_name}`.trim()
+
   return (
     <div className="_layout _layout_main_wrapper">
         <LayoutMood/>
         <div className="_main_layout">
-          <DesktopHeader />
+          <DesktopHeader userName={userName} />
         <MobileHeader />
           <MobileNavbar />
           <div className="container _custom_container">
@@ -34,11 +43,7 @@ export default function FeedsPage() {
                       <StoryFeedDesktop />
                       <StoryFeedMobile />
                     <CreatePost />
-                    <Post />
-                    <Post />
-                    <Post />
-                    <Post />
-                    <Post />
+                    <FeedTimeline initialPage={initialFeedPage} />
                     </div>
                   </div>
                 </div>

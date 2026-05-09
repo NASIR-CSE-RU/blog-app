@@ -15,25 +15,6 @@ if (toggleMode && layout) {
 	});
 }
 /*-----Custom JS Dark Mode End For Feed01 ------*/
-// Custom Dropdown for profile
-var profileDropdown = document.querySelector("#_prfoile_drop");
-var profileDropShowBtn = document.querySelector("#_profile_drop_show_btn");
-var isDropShow = false;
-
-if (profileDropdown && profileDropShowBtn) {
-	profileDropShowBtn.addEventListener("click", function(){
-		isDropShow = !isDropShow;
-		if(isDropShow){
-			profileDropdown.classList.add('show');
-		}
-		else{
-			profileDropdown.classList.remove('show');
-		}
-	});
-}
-
-// Custom Dropdown for profile
-
 //Custom Dropdown for timeline
 var timelineDropdown = document.querySelector("#_timeline_drop");
 var timelineDropShowBtn = document.querySelector("#_timeline_show_drop_btn");
