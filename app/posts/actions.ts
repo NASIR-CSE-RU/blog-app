@@ -116,7 +116,10 @@ export async function createCommentAction(
     };
   }
 
-  if (parentIdValue !== null && (!Number.isInteger(parentId) || parentId <= 0)) {
+  if (
+    parentIdValue !== null &&
+    (parentId === null || !Number.isInteger(parentId) || parentId <= 0)
+  ) {
     return {
       errors: {
         parent_id: INVALID_PARENT_MESSAGE,
