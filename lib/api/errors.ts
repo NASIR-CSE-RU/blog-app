@@ -3,6 +3,8 @@ export type ApiErrorPayload = {
   errors?: unknown;
 } | null;
 
+type ApiErrorPayloadInput = ApiErrorPayload | undefined;
+
 export class ApiRequestError extends Error {
   constructor(
     message: string,
@@ -13,7 +15,7 @@ export class ApiRequestError extends Error {
   }
 }
 
-function getApiFieldErrors(payload: ApiErrorPayload) {
+function getApiFieldErrors(payload: ApiErrorPayloadInput) {
   if (
     !payload?.errors ||
     typeof payload.errors !== "object" ||
@@ -37,11 +39,11 @@ function getApiFieldErrors(payload: ApiErrorPayload) {
   return Object.keys(fieldErrors).length > 0 ? fieldErrors : undefined;
 }
 
-export function getApiFieldError(payload: ApiErrorPayload, field: string) {
+export function getApiFieldError(payload: ApiErrorPayloadInput, field: string) {
   return getApiFieldErrors(payload)?.[field]?.[0];
 }
 
-export function getApiErrorMessage(payload: ApiErrorPayload) {
+export function getApiErrorMessage(payload: ApiErrorPayloadInput) {
   const fieldErrors = getApiFieldErrors(payload);
 
   if (fieldErrors) {

@@ -6,7 +6,7 @@ import { AUTH_TOKEN_COOKIE, AUTH_USER_COOKIE } from "@/lib/auth/constants";
 const AUTH_PAGES = new Set(["/login", "/registration"]);
 const PROTECTED_PREFIXES = ["/feeds"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasToken = Boolean(request.cookies.get(AUTH_TOKEN_COOKIE)?.value);
   const hasUser = Boolean(request.cookies.get(AUTH_USER_COOKIE)?.value);
